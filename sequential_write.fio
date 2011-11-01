@@ -4,21 +4,28 @@
 ; Sequential write pattern -jdc
 
 [global]
-; output=sequential_write_log.txt
-
-[writer]
 name=writer
 description=Sequential write pattern
-directory=/Volumes/ramdisk
+directory=/Volumes/External
 rw=write
 ioengine=posixaio
 iodepth=4
 direct=0
-bs=64k
-size=900m
-runtime=5m
+size=1g
+runtime=1m
 time_based
 write_bw_log
 write_lat_log
 thread
 
+[sequential-write-4k]
+stonewall
+bs=4k
+
+[sequential-write-16k]
+stonewall
+bs=16k
+
+[sequential-write-64k]
+stonewall
+bs=64k
