@@ -1,0 +1,24 @@
+; fio job file
+; http://git.kernel.dk/?p=fio.git
+;
+; Sequential write pattern -jdc
+
+[global]
+; output=sequential_write_log.txt
+
+[writer]
+name=writer
+description=Sequential write pattern
+directory=/Volumes/ramdisk
+rw=write
+ioengine=posixaio
+iodepth=4
+direct=0
+bs=64k
+size=900m
+runtime=5m
+time_based
+write_bw_log
+write_lat_log
+thread
+
