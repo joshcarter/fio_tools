@@ -1,0 +1,47 @@
+; fio job file
+; http://git.kernel.dk/?p=fio.git
+;
+; Sequential write pattern -jdc
+
+[global]
+directory=/Volumes/External
+ioengine=posixaio
+iodepth=4
+direct=0
+size=100m
+runtime=10s
+time_based
+write_bw_log
+write_lat_log
+thread
+stonewall
+
+[sequential-write-4k]
+name=sequential-write
+rw=write
+bs=4k
+
+[sequential-write-16k]
+name=sequential-write
+rw=write
+bs=16k
+
+[sequential-write-64k]
+name=sequential-write
+rw=write
+bs=64k
+
+[sequential-read-4k]
+name=sequential-read
+rw=read
+bs=4k
+
+[sequential-read-16k]
+name=sequential-read
+rw=read
+bs=16k
+
+[sequential-read-64k]
+name=sequential-read
+rw=read
+bs=64k
