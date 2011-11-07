@@ -3,6 +3,9 @@ library("ggplot2")
 div1000 <- function(x) { x / 1000 }
 div1024 <- function(x) { x / 1024 }
 
+#
+# Bandwidth
+#
 read_bw_log <- function(file_name) {
   if (file.exists(file_name)) {
     # Read from log file
@@ -66,6 +69,28 @@ bw_scatterplot <- function(bw, ylim_low, ylim_high) {
   p + geom_point(aes(color = block_size))
 
 }
+
+#
+# Latency
+#
+read_lat_log <- function(file_name) {
+  if (file.exists(file_name)) {
+    # Read from log file
+    df <- read.table(file_name, col.names=c("time", "latency", "stream", "block_size"), sep=",")
+    
+    if (nrow(df) == 0) {
+      simpleError(cat("file is empty:", file_name))
+    }
+    
+    # Improve formatting
+    df <- data.frame(time = sapply(df$time, div1000), latency = df$latency, block_size = factor(df$block_size))
+  
+    return(df)
+  }
+  else {
+    simpleError(cat("file does not exist:", file_name))
+  }
+}bw
 
 read_latency_log <- function(file_name) {
   if (file.exists(file_name)) {
