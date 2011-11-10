@@ -1,3 +1,6 @@
+# Beginnings of analysis tools for fio logs. Don't use any of these 
+# functions blindly at the moment, they may not do what you want.
+
 library("ggplot2")
 
 div1000 <- function(x) { x / 1000 }
@@ -34,10 +37,9 @@ read_combined_bw <- function(write, read) {
 
 bw_base <- function(bw) {
   # Scale y-max to median + 3 standard deviations
-  # y_max = median(bw$rate) + (sd(bw$rate) * 2)
+  y_max = median(bw$rate) + (sd(bw$rate) * 2)
   # Round up to nearest 10
-  # y_max = ceiling(y_max / 10) * 10
-  y_max = 60 # FIXME
+  y_max = ceiling(y_max / 10) * 10
   
   p <- ggplot(bw) +
     aes(time, rate) +
@@ -60,7 +62,8 @@ bw_boxplots <- function(bw) {
 
 bw_scatterplot <- function(bw) {
   p <- bw_base(bw) + 
-    geom_point(aes(color = block_size))
+    geom_point(aes(color = block_size)) +
+    facet_grid(. ~ op)
   
   return(p)
 }
@@ -136,9 +139,9 @@ lat_densityplot <- function(lat) {
     lat <- lat[sample(nrow(lat), 10000), ]
   }
 
-  p <- lat_base(slat) +
+  p <- lat_base(lat) +
     scale_y_log10(breaks = c(10, 100, 1000, 10000, 100000), labels = c("10us", "100us", "1ms", "10ms", "100ms")) +
-    stat_density2d(geom="point", aes(size = ..density..), contour = F) +
+    stat_density2d(geom="point", n = 50, aes(size = ..density..), contour = F) +
     scale_area(to = c(0.2, 1.5))
     
   return(p)
