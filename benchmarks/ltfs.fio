@@ -1,0 +1,26 @@
+; fio job file
+; http://git.kernel.dk/?p=fio.git
+;
+; Write benchmark for LTFS-formatted tapes
+
+[global]
+directory=/mnt/tape
+ioengine=posixaio
+iodepth=4
+direct=0
+size=1T
+write_bw_log
+thread
+stonewall
+
+; Tape drives use compression, so we're best off creating new 
+; buffers for each IO.
+refill_buffers
+
+; Don't pre-allocate, LTFS probably behaves best when you lay
+; down the file without it.
+fallocate=none
+
+[sequential]
+rw=${RW}
+bs=${BS}
