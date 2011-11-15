@@ -1,0 +1,24 @@
+; fio job file
+; http://git.kernel.dk/?p=fio.git
+;
+; Ramped bandwidth test
+
+[global]
+filename=/dev/disk2
+ioengine=posixaio
+iodepth=4
+direct=0
+size=100m
+runtime=10s
+ramp_time=10s
+time_based
+write_bw_log
+write_lat_log
+thread
+stonewall
+
+[write]
+rw=write
+rate=${RATE}
+ratemin=${RATEMIN}
+bs=${BS}
