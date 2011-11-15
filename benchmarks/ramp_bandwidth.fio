@@ -4,13 +4,11 @@
 ; Ramped bandwidth test
 
 [global]
-filename=/dev/disk2
-ioengine=posixaio
-iodepth=4
-direct=0
-size=100m
+filename=/dev/sdb
+ioengine=sync
+size=100g
 runtime=10s
-ramp_time=10s
+; ramp_time=5s
 time_based
 write_bw_log
 write_lat_log
@@ -19,6 +17,6 @@ stonewall
 
 [write]
 rw=write
-rate=${RATE}
-ratemin=${RATEMIN}
+rate=,${RATE}
+ratemin=,${RATEMIN}
 bs=${BS}
