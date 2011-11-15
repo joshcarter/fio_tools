@@ -10,12 +10,16 @@ size=100g
 runtime=10s
 ; ramp_time=5s
 time_based
+disable_lat=1
+disable_slat=1
+; disable_clat=false
+; disable_bw=false
 write_bw_log
 write_lat_log
 thread
 stonewall
 
-[write]
+[ramp]
 rw=write
 rate=,${RATE}
 ratemin=,${RATEMIN}
