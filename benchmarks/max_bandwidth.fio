@@ -9,14 +9,12 @@ ioengine=sync
 direct=1
 size=6g
 time_based
-runtime=10s
+runtime=20s
 disable_lat=1
 disable_slat=1
 write_bw_log
 write_lat_log
 
-[ramp]
+[max]
 rw=write
-rate=,${RATE}
-ratemin=,${RATEMIN}
 bs=${BS}
