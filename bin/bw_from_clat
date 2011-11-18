@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require File.join(File.dirname(__FILE__), '..', 'lib', 'log_file')
+
+logfile = ARGV.first
+
+if logfile.nil?
+  options = Dir["*_clat.log"]
+
+  if options.length == 1
+    logfile = options.first
+  else
+   puts "I don't know which logfile to parse. Options:"
+   options.each { |o| puts "- #{o}"}
+   exit 0
+  end
+end
+
+puts "Processing #{logfile}..."
+
+LogFile.new(logfile).summarize_to("summary.log")
