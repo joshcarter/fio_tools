@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+# TODO: should handle runs with multiple block sizes separated out 
+# into extra column.
+
 require File.join(File.dirname(__FILE__), '..', 'lib', 'log_file')
 
 logfile = ARGV.first
