@@ -28,6 +28,25 @@ read_bw_log <- function(file_name) {
   }
 }
 
+read_merged_bw_log <- function(file_name) {
+  if (file.exists(file_name)) {
+    # Read from log file
+    df <- read.table(file_name, col.names=c("time", "rate", "stream", "block_size", "target_rate"), sep=",")
+    
+    if (nrow(df) == 0) {
+      simpleError(cat("file is empty:", file_name))
+    }
+    
+    # Improve formatting
+    df <- data.frame(time = sapply(df$time, div1000), rate = sapply(df$rate, div1024), block_size = factor(df$block_size))
+  
+    return(df)
+  }
+  else {
+    simpleError(cat("file does not exist:", file_name))
+  }
+}
+
 read_combined_bw <- function(write, read) {
   read <- data.frame(read_bw_log(read), op = "read")
   write <- data.frame(read_bw_log(write), op = "write")
@@ -108,6 +127,25 @@ read_lat_log <- function(file_name) {
     
     # Improve formatting
     df <- data.frame(time = sapply(df$time, div1000), latency = df$latency, block_size = factor(df$block_size))
+  
+    return(df)
+  }
+  else {
+    simpleError(cat("file does not exist:", file_name))
+  }
+}
+
+read_merged_lat_log <- function(file_name) {
+  if (file.exists(file_name)) {
+    # Read from log file
+    df <- read.table(file_name, col.names=c("time", "latency", "stream", "block_size", "target_rate"), sep=",")
+    
+    if (nrow(df) == 0) {
+      simpleError(cat("file is empty:", file_name))
+    }
+    
+    # Improve formatting
+    df <- data.frame(time = sapply(df$time, div1000), latency = df$latency, block_size = factor(df$block_size), target_rate = df$target_rate)
   
     return(df)
   }

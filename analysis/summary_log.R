@@ -3,6 +3,7 @@
 #
 # To use:
 #   df <- read_summary_log("summary.log")
+#   summary(df)
 #   plot_summary_log(df)
 #
 
@@ -14,14 +15,19 @@ div1024 <- function(x) { x / 1024 }
 read_summary_log <- function(file_name) {
   if (file.exists(file_name)) {
     # Read from log file
-    df <- read.table(file_name, col.names=c("time", "rate", "lat_mean", "lat_sd"), sep=",")
+    df <- read.table(file_name, col.names=c("time", "block_size", "rate", "lat_mean", "lat_sd"), sep=",")
   
     if (nrow(df) == 0) {
       simpleError(cat("file is empty:", file_name))
     }
   
     # Improve formatting
-    df <- data.frame(time = sapply(df$time, div1000), rate = sapply(df$rate, div1024), lat_mean = df$lat_mean, lat_sd = df$lat_sd)
+    df <- data.frame(
+      time = sapply(df$time, div1000),
+      block_size = factor(df$block_size),
+      rate = sapply(df$rate, div1024),
+      lat_mean = df$lat_mean,
+      lat_sd = df$lat_sd)
 
     return(df)
   }
@@ -35,7 +41,8 @@ plot_summary_log <- function(df) {
     aes(rate, lat_mean) +
     xlab("Data rate (MB/s)") +
     ylab("Latency (usec)") +
-    geom_point(alpha = I(1 / 5))
+    scale_y_log10(breaks = c(10, 100, 1000, 10000, 100000), labels = c("10us", "100us", "1ms", "10ms", "100ms")) +
+    geom_point(aes(color = block_size), alpha = I(1 / 5))
     
   return(p)
 }
