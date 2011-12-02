@@ -1,0 +1,24 @@
+; fio job file
+; http://git.kernel.dk/?p=fio.git
+;
+; Ramped bandwidth test.
+
+[global]
+filename=/dev/sdb
+size=50g
+ioengine=sync
+direct=1
+time_based
+runtime=30m
+
+; only care about completion latency
+disable_lat=1
+disable_slat=1
+write_bw_log
+write_lat_log
+
+[latency_vs_block_size]
+rw=randrw
+; bsrange=512-1m
+bssplit=512/:1k/:2k/:4k/8k/:16k/:32k/:64k/:128k/:256k/:512k/:1m/
+blockalign=4k
