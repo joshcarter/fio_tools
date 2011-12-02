@@ -1,0 +1,23 @@
+; fio job file
+; http://git.kernel.dk/?p=fio.git
+;
+; Ramped bandwidth test (using ratestep)
+
+[global]
+filename=/dev/sdb
+ioengine=sync
+direct=1
+size=6g
+time_based
+runtime=1h
+disable_lat=1
+disable_slat=1
+write_bw_log
+write_lat_log
+
+[ramp]
+rw=write
+rate=,100k
+ratestep=,100k
+ratecycle=2000
+bs=16k
