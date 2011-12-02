@@ -6,6 +6,25 @@
 #   summary(df)
 #   plot_summary_log(df)
 #
+# Pull out pieces:
+# > c <- df[df[,"block_size"] == 16384,]
+# > summary(c)
+#       time            block_size        rate            lat_mean         lat_sd       
+#  Min.   :   0.993   4096   :   0   Min.   : 0.4844   Min.   :211.8   Min.   :   1.01  
+#  1st Qu.: 451.070   16384  :1797   1st Qu.:42.8125   1st Qu.:316.6   1st Qu.: 529.10  
+#  Median : 900.882   65536  :   0   Median :46.2344   Median :327.5   Median : 682.64  
+#  Mean   : 900.917   262144 :   0   Mean   :40.1666   Mean   :328.2   Mean   : 714.77  
+#  3rd Qu.:1350.814   1048576:   0   3rd Qu.:47.6094   3rd Qu.:339.0   3rd Qu.: 844.34  
+#  Max.   :1800.013                  Max.   :53.7656   Max.   :964.3   Max.   :4142.19  
+# > c <- df[df[,"block_size"] == 16384 & df[,"rate"] > 40,]
+# > summary(c)
+#       time          block_size        rate          lat_mean         lat_sd      
+#  Min.   : 121.6   4096   :   0   Min.   :40.11   Min.   :285.8   Min.   : 326.3  
+#  1st Qu.: 688.5   16384  :1445   1st Qu.:45.23   1st Qu.:321.0   1st Qu.: 574.0  
+#  Median :1050.2   65536  :   0   Median :46.66   Median :329.7   Median : 707.8  
+#  Mean   :1054.8   262144 :   0   Mean   :46.48   Mean   :331.8   Mean   : 738.4  
+#  3rd Qu.:1437.9   1048576:   0   3rd Qu.:47.94   3rd Qu.:339.8   3rd Qu.: 867.5  
+#  Max.   :1799.6                  Max.   :53.77   Max.   :385.6   Max.   :1515.0  
 
 library("ggplot2")
 
@@ -45,4 +64,20 @@ plot_summary_log <- function(df) {
     geom_point(aes(color = block_size), alpha = I(1 / 5))
     
   return(p)
+}
+
+summary_log_summary <- function(df) {
+  blocks <- c()
+  means <- c()
+  sds <- c()
+
+  for (b in levels(df[,"block_size"])) {
+    sub <- df[df[,"block_size"] == b,]
+    
+    blocks <- b
+    means <- c(means, mean(sub$lat_mean))
+    sds <- c(sds, mean(sub$lat_sd))
+  }
+  
+  return data.frame(block_size = blocks, mean = means, sd = sds)
 }
