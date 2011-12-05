@@ -1,52 +1,12 @@
 # Beginnings of analysis tools for fio logs. Don't use any of these 
 # functions blindly at the moment, they may not do what you want.
 
+source("fio_log_parsers.R")
 library("ggplot2")
-
-div1000 <- function(x) { x / 1000 }
-div1024 <- function(x) { x / 1024 }
 
 #
 # Bandwidth
 #
-read_bw_log <- function(file_name) {
-  if (file.exists(file_name)) {
-    # Read from log file
-    df <- read.table(file_name, col.names=c("time", "rate", "dir", "block_size"), sep=",")
-    
-    if (nrow(df) == 0) {
-      simpleError(cat("file is empty:", file_name))
-    }
-    
-    # Improve formatting
-    df <- data.frame(time = sapply(df$time, div1000), rate = sapply(df$rate, div1024), dir = factor(df$dir, levels=c(0,1), labels=c("read", "write")), block_size = factor(df$block_size))
-  
-    return(df)
-  }
-  else {
-    simpleError(cat("file does not exist:", file_name))
-  }
-}
-
-read_merged_bw_log <- function(file_name) {
-  if (file.exists(file_name)) {
-    # Read from log file
-    df <- read.table(file_name, col.names=c("time", "rate", "stream", "block_size", "target_rate"), sep=",")
-    
-    if (nrow(df) == 0) {
-      simpleError(cat("file is empty:", file_name))
-    }
-    
-    # Improve formatting
-    df <- data.frame(time = sapply(df$time, div1000), rate = sapply(df$rate, div1024), block_size = factor(df$block_size))
-  
-    return(df)
-  }
-  else {
-    simpleError(cat("file does not exist:", file_name))
-  }
-}
-
 read_combined_bw <- function(write, read) {
   read <- data.frame(read_bw_log(read), op = "read")
   write <- data.frame(read_bw_log(write), op = "write")
@@ -116,43 +76,6 @@ generate_bw_graphs <- function() {
 #
 # Latency
 #
-read_lat_log <- function(file_name) {
-  if (file.exists(file_name)) {
-    # Read from log file
-    df <- read.table(file_name, col.names=c("time", "latency", "dir", "block_size"), sep=",")
-    
-    if (nrow(df) == 0) {
-      simpleError(cat("file is empty:", file_name))
-    }
-    
-    # Improve formatting
-    df <- data.frame(time = sapply(df$time, div1000), latency = df$latency, dir = factor(df$dir, levels=c(0,1), labels=c("read", "write")), block_size = factor(df$block_size))
-  
-    return(df)
-  }
-  else {
-    simpleError(cat("file does not exist:", file_name))
-  }
-}
-
-read_merged_lat_log <- function(file_name) {
-  if (file.exists(file_name)) {
-    # Read from log file
-    df <- read.table(file_name, col.names=c("time", "latency", "stream", "block_size", "target_rate"), sep=",")
-    
-    if (nrow(df) == 0) {
-      simpleError(cat("file is empty:", file_name))
-    }
-    
-    # Improve formatting
-    df <- data.frame(time = sapply(df$time, div1000), latency = df$latency, block_size = factor(df$block_size), target_rate = df$target_rate)
-  
-    return(df)
-  }
-  else {
-    simpleError(cat("file does not exist:", file_name))
-  }
-}
 
 read_combined_lat <- function(write, read) {
   read <- data.frame(read_lat_log(read), op = "read")
