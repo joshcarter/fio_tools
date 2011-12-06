@@ -1,0 +1,21 @@
+; fio job file
+; http://git.kernel.dk/?p=fio.git
+;
+; Bandwidth as a function of block size and operation
+
+[global]
+filename=/dev/sdb
+ioengine=posixaio
+iodepth=4
+direct=1
+size=50g
+time_based
+runtime=1m
+disable_lat=1
+disable_slat=1
+write_bw_log
+write_lat_log
+
+[bw_vs_block_size]
+rw=${RW}
+bs=${BS}
