@@ -1,5 +1,4 @@
-# Beginnings of analysis tools for fio logs. Don't use any of these 
-# functions blindly at the moment, they may not do what you want.
+# This stuff is all pretty old.
 
 source("fio_log_parsers.R")
 library("ggplot2")
