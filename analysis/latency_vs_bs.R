@@ -1,3 +1,4 @@
+library("ggplot2")
 source("fio_log_parsers.R")
 
 # We need for our model, for each block size and direction:
@@ -73,8 +74,73 @@ complete_boxplot <- function(df) {
   return(p)
 }
 
+#
+# Histogram with panels for dir/block size, showing latency distribution.
+#
 complete_hist <- function(df) {
   p <- ggplot(df) +
+    aes(latency, ..ndensity..) +
+    xlab("Log10 Latency (usec)") +
+    ylab("Density") +
+    scale_x_log10(
+      breaks = c(10, 100, 1000, 10000, 100000),
+      labels = c("10us", "100us", "1ms", "10ms", "100ms")) +
+    scale_y_continuous(
+      breaks = c(1),
+      labels = c("1")) +
+    facet_grid(block_size ~ dir) +
+    geom_histogram(binwidth = 0.2)
+    
+  return(p)
+}
+
+#
+# Detail histogram for given direction and block size.
+#
+detail_hist <- function(df, block_size, dir) {
+  subset <- df[df[,"block_size"] == block_size & df[,"dir"] == dir,]
+
+  p <- ggplot(subset) +
+    aes(latency, ..ndensity..) +
+    xlab("Log10 Latency (usec)") +
+    ylab("Density") +
+    scale_x_log10(
+      breaks = c(10, 100, 1000, 10000, 100000),
+      labels = c("10us", "100us", "1ms", "10ms", "100ms")) +
+    scale_y_continuous(
+      breaks = c(1),
+      labels = c("1")) +
+    geom_histogram(binwidth = 0.1)
+    
+  return(p)
+}
+
+drop_below_min <- function(x, min) { if (x < min) NA else x }
+
+model_samples <- function(mean, sd, min, nsamples) {
+  samples <- rnorm(mean, sd, nsamples)
+
+  # FIXME: drops samples below minimum, will cause returned samples
+  # to be less than nsamples.
+  samples <- na.omit(sapply(samples, drop_below_min, min))
+  
+  return(data.frame(latency = samples))
+}
+
+#
+# Compare actual data vs. samples from model
+#
+# Sample use:
+#
+# df <- read_lat_log("latency_vs_block_size_clat.log")
+# write_4k_real = df[df[,"block_size"] == 4096 & df[,"dir"] == "write",]
+# > min(write_4k_real$latency)
+# [1] 170
+# write_4k_model <- model_samples(1000, 1000, 170, 1000)
+# comparison_hist(write_4k_real, write_4k_model)
+#
+comparison_hist <- function(df1, df2) {
+  p <- ggplot(df1) +
     aes(latency, ..density..) +
     xlab("Log10 Latency (usec)") +
     ylab("Density") +
@@ -84,8 +150,8 @@ complete_hist <- function(df) {
     scale_y_continuous(
       breaks = c(1, 10),
       labels = c("1", "10")) +
-    facet_grid(block_size ~ dir) +
-    geom_histogram(binwidth = 0.2)
+    geom_histogram(binwidth = 0.1, fill = "blue", alpha = I(1/2)) +
+    geom_histogram(binwidth = 0.1, fill = "red", alpha = I(1/2), data = df2)
     
   return(p)
 }

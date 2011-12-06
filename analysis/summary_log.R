@@ -27,57 +27,15 @@
 #  Max.   :1799.6                  Max.   :53.77   Max.   :385.6   Max.   :1515.0  
 
 library("ggplot2")
+source("fio_log_parsers.R")
 
-div1000 <- function(x) { x / 1000 }
-div1024 <- function(x) { x / 1024 }
-
-read_summary_log <- function(file_name) {
-  if (file.exists(file_name)) {
-    # Read from log file
-    df <- read.table(file_name, col.names=c("time", "block_size", "rate", "lat_mean", "lat_sd"), sep=",")
-  
-    if (nrow(df) == 0) {
-      simpleError(cat("file is empty:", file_name))
-    }
-  
-    # Improve formatting
-    df <- data.frame(
-      time = sapply(df$time, div1000),
-      block_size = factor(df$block_size),
-      rate = sapply(df$rate, div1024),
-      lat_mean = df$lat_mean,
-      lat_sd = df$lat_sd)
-
-    return(df)
-  }
-  else {
-    simpleError(cat("file does not exist:", file_name))
-  }
-}
-
-plot_summary_log <- function(df) {
-  p <- ggplot(df) +
-    aes(rate, lat_mean) +
-    xlab("Data rate (MB/s)") +
-    ylab("Latency (usec)") +
-    scale_y_log10(breaks = c(10, 100, 1000, 10000, 100000), labels = c("10us", "100us", "1ms", "10ms", "100ms")) +
-    geom_point(aes(color = block_size), alpha = I(1 / 5))
-    
-  return(p)
-}
-
-summary_log_summary <- function(df) {
-  blocks <- c()
-  means <- c()
-  sds <- c()
-
-  for (b in levels(df[,"block_size"])) {
-    sub <- df[df[,"block_size"] == b,]
-    
-    blocks <- b
-    means <- c(means, mean(sub$lat_mean))
-    sds <- c(sds, mean(sub$lat_sd))
-  }
-  
-  return data.frame(block_size = blocks, mean = means, sd = sds)
-}
+# plot_summary_log_lat <- function(df) {
+#   p <- ggplot(df) +
+#     aes(rate, lat_mean) +
+#     xlab("Data rate (MB/s)") +
+#     ylab("Latency (usec)") +
+#     scale_y_log10(breaks = c(10, 100, 1000, 10000, 100000), labels = c("10us", "100us", "1ms", "10ms", "100ms")) +
+#     geom_point(aes(color = block_size), alpha = I(1 / 5))
+#     
+#   return(p)
+# }

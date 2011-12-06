@@ -13,6 +13,7 @@ class LogFile
     start_time = nil
     end_time = nil
     current_bs = nil
+    current_dir = nil
     
     File.open(outname, "w") do |outfile|
       File.open(@name) do |infile|
@@ -25,18 +26,22 @@ class LogFile
           if start_time.nil?
             start_time = time
             current_bs = block_size
-          elsif (time > start_time + 1000) || (current_bs != block_size)
+            current_dir = ddir
+          elsif (time > start_time + 1000) || (current_bs != block_size) || (current_dir != ddir)
             lat_mean, lat_sd = summarize latencies
             
-            outfile.printf("%8d, %8d, %8d, %8.2f, %8.2f\n",
+            outfile.printf("%8d, %8d, %1d, %8d, %8d, %8.2f, %8.2f\n",
               end_time,
               current_bs,
-              sum(bytes) / 1024,
+              current_dir,
+              sum(bytes) / 1024,        # bandwidth (KB/s)
+              sum(bytes) / current_bs,  # IOPS
               lat_mean,
               lat_sd)
             
             start_time = time
             current_bs = block_size
+            current_dir = ddir
             latencies = []
             bytes = []
           end
