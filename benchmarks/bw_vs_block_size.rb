@@ -3,7 +3,7 @@
 require 'pp'
 
 block_sizes = (0..11).to_a.map { |i| 512 << i } # 512..1M
-ops = ["read", "write"]
+ops = ["randread", "randwrite"]
 
 block_sizes.each do |bs|
   ops.each do |op|

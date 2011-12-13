@@ -8,9 +8,11 @@ filename=/dev/sdb
 ioengine=posixaio
 iodepth=4
 direct=1
-size=50g
+size=46g
 time_based
 runtime=1m
+
+; only care about completion latency
 disable_lat=1
 disable_slat=1
 write_bw_log
@@ -19,3 +21,4 @@ write_lat_log
 [bw_vs_block_size]
 rw=${RW}
 bs=${BS}
+blockalign=4k
