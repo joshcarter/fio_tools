@@ -4,14 +4,23 @@
 ; Write benchmark for LTFS-formatted tapes
 
 [global]
+
+; Configure these
 directory=/mnt/tape
+size=100G
+
+; Async and buffered IO
 ioengine=posixaio
 iodepth=4
 direct=0
-size=1T
-write_bw_log
 thread
 stonewall
+
+; Only care about bandwidth and completion latency
+disable_lat=1
+disable_slat=1
+write_bw_log
+write_lat_log
 
 ; Tape drives use compression, so we're best off creating new 
 ; buffers for each IO.
@@ -21,6 +30,6 @@ refill_buffers
 ; down the file without it.
 fallocate=none
 
-[sequential]
+[ltfs]
 rw=${RW}
 bs=${BS}
