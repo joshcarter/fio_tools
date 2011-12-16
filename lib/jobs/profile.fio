@@ -1,0 +1,25 @@
+; fio job file
+; http://git.kernel.dk/?p=fio.git
+;
+; Bandwidth as a function of block size and operation
+
+[global]
+description=Standard read/write tests over range of block sizes
+filename=/dev/sdd
+ioengine=posixaio
+iodepth=4
+direct=1
+size=46g
+time_based
+runtime=1m
+
+; only care about completion latency
+disable_lat=1
+disable_slat=1
+write_bw_log
+write_lat_log
+
+[profile]
+rw=${RW}
+bs=${BS}
+blockalign=4k
