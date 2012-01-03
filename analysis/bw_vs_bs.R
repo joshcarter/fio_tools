@@ -63,3 +63,44 @@ bw_boxplot <- function(df) {
   return(p)
 }
 
+#
+# Display bandwidth view over time, broken down by op and block size.
+#
+bw_vs_time <- function(df) {
+  p <- ggplot(df) +
+    aes(time, rate) +
+    xlab("Time (s)") +
+    ylab("Bandwidth (MB/s)") +
+    facet_grid(. ~ dir) +
+    geom_smooth(aes(color = block_size))
+  
+  return(p)
+}
+
+#
+# Compare two bandwidth summary frames.
+#
+# TODO: better labeling of color <-> product
+# TODO: greyscale color scheme
+#
+bw_summary_comparison <- function(summary1, summary2) {
+  y_max <- max(
+    max(summary1$rate_mean + summary1$rate_sd),
+    max(summary2$rate_mean + summary2$rate_sd))
+
+  p <- ggplot(summary1) +
+    aes(block_size, rate_mean) +
+    xlab("Block Size (b)") +
+    ylab("Bandwidth (MB/s)") +
+    scale_x_discrete(
+      breaks = c(512, 2048, 16384, 65536, 262144, 1048576),
+      labels = c("512", "2K", "16K", "64K", "256K", "1M")) +
+    scale_y_continuous(limits = c(0, y_max)) +
+    facet_grid(. ~ dir) +
+    geom_bar(fill = "blue", alpha = I(1/2)) +
+    geom_errorbar(aes(ymin = rate_mean - rate_sd, ymax = rate_mean + rate_sd), color = "blue") +
+    geom_bar(fill = "red", alpha = I(1/2), data = summary2) +
+    geom_errorbar(aes(ymin = rate_mean - rate_sd, ymax = rate_mean + rate_sd), color = "red", data = summary2)
+    
+  return(p)
+}
