@@ -20,8 +20,6 @@ opts = OptionParser.new do |opts|
   opts.separator "Disks available:"
 
   Disk.all.each do |d|
-    next if d.name == "sda" # Skip boot disk
-
     opts.separator " - #{d.inspect}"
   end
 
@@ -40,7 +38,7 @@ opts = OptionParser.new do |opts|
   end
 
   opts.on("-j", "--job JOB", "FIO job to run") do |j|
-    options.job = j
+    options.job = FioJob.new(j + ".fio")
   end
 
   # opts.on("-l", "--length [LENGTH]", [:short, :long], 
@@ -67,6 +65,7 @@ options.log_directory = File.join(logs_root,
 
 puts "Disk: #{options.disk.inspect}"
 puts "Job: #{options.job.inspect}"
+puts "Job options: #{options.job.options.to_a.join(', ')}"
 puts "Logs: #{options.log_directory}"
 
 __END__

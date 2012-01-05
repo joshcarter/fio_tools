@@ -5,13 +5,13 @@
 
 [global]
 description=Standard read/write tests over range of block sizes
-filename=/dev/sdd
+filename=${FILENAME}
 ioengine=posixaio
 iodepth=4
 direct=1
-size=46g
+size=${SIZE}
 time_based
-runtime=1m
+runtime=${RUNTIME}
 
 ; only care about completion latency
 disable_lat=1
