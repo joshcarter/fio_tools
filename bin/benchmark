@@ -1,75 +1,66 @@
 #!/usr/bin/env ruby
 
-require 'optparse'
-require 'ostruct'
-require 'pp'
-require 'fileutils'
-
-tools_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-logs_root = File.expand_path(File.join(ENV['HOME'], 'fio_logs'))
-
-require File.join(tools_root, 'lib', 'disk')
-require File.join(tools_root, 'lib', 'fio_job')
-
-options = OpenStruct.new
-
-opts = OptionParser.new do |opts|
-  opts.banner = "Usage: benchmark [options]"
-
-  opts.separator "" 
-  opts.separator "Disks available:"
-
-  Disk.all.each do |d|
-    opts.separator " - #{d.inspect}"
-  end
-
-  opts.separator "" 
-  opts.separator "Jobs:"
-
-  FioJob.all.each do |j|
-    opts.separator " - #{j.inspect}"
-  end
-
-  opts.separator ""
-  opts.separator "Specific options:"
-
-  opts.on("-d", "--disk DISK", "Disk to test") do |d|
-    options.disk = Disk.new(d)
-  end
-
-  opts.on("-j", "--job JOB", "FIO job to run") do |j|
-    options.job = FioJob.new(j + ".fio")
-  end
-
-  # opts.on("-l", "--length [LENGTH]", [:short, :long], 
-  #         "Specify test length (short, long)") do |l|
-  #   options.length = l
-  # end
-
-  opts.on_tail("-h", "--help", "Show this message") do
-    puts opts
-    exit
+# 1.9 adds realpath to resolve symlinks; 1.8 doesn't
+# have this method, so we add it so we get resolved symlinks
+# and compatibility
+unless File.respond_to? :realpath
+  class File #:nodoc:
+    def self.realpath path
+      return realpath(File.readlink(path)) if symlink?(path)
+      path
+    end
   end
 end
 
-opts.parse!(ARGV)
+$: << File.expand_path(File.dirname(File.realpath(__FILE__)) + '/../lib')
 
-if options.disk.nil? || options.job.nil?
-  puts opts
-  exit
+require 'rubygems'
+require 'gli'
+require 'disk'
+require 'fio_job'
+
+include GLI
+
+program_desc 'Run standard benchmarks on block devices'
+
+version '1.0.0'
+
+#
+# Global Options
+#
+desc 'Directory for log files'
+arg_name 'dir'
+default_value Dir.pwd
+flag [:l, :log]
+
+#
+# Load jobs from lib/jobs
+#
+job_dir = File.expand_path(File.dirname(File.realpath(__FILE__)) + '/../lib/jobs')
+Dir.open(job_dir).entries.grep(/.rb$/).map do |name|
+  require File.join(job_dir, name)
 end
 
-options.log_directory = File.join(logs_root, 
-                                  options.disk.model.gsub(/\s+/, '_'),
-                                  Time.now.strftime("%Y_%m_%d_%H_%M"))
+pre do |global,command,options,args|
+  # Pre logic here
+  # Return true to proceed; false to abourt and not call the
+  # chosen command
+  # Use skips_pre before a command to skip this block
+  # on that command only
+  true
+end
 
-puts "Disk: #{options.disk.inspect}"
-puts "Job: #{options.job.inspect}"
-puts "Job options: #{options.job.options.to_a.join(', ')}"
-puts "Logs: #{options.log_directory}"
+post do |global,command,options,args|
+  # Post logic here
+  # Use skips_post before a command to skip this
+  # block on that command only
+end
 
-__END__
+on_error do |exception|
+  # Error logic here
+  # return false to skip default error handling
+  true
+end
 
-FileUtils.mkdir_p(options.log_directory)
-Dir.chdir(options.log_directory)
+exit GLI.run(ARGV)
 
