@@ -89,7 +89,7 @@ complete_hist <- function(df) {
       breaks = c(1),
       labels = c("1")) +
     facet_grid(block_size ~ dir) +
-    geom_histogram(binwidth = 0.2)
+    geom_histogram(binwidth = 0.05)
     
   return(p)
 }

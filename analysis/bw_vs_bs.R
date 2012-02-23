@@ -77,6 +77,43 @@ bw_vs_time <- function(df) {
   return(p)
 }
 
+bw_vs_time3 <- function(df, mark_x_min, mark_x_max) {
+  ymax = max(df$rate)
+  
+  p <- ggplot(df) +
+    aes(time, rate) +
+    xlab("Time (s)") +
+    ylab("Bandwidth (MB/s)") +
+    ylim(0, ymax) +
+    scale_y_continuous(
+      breaks = c(100, 1000),
+      labels = c("100MB/s", "1GB/s")) +
+    facet_grid(block_size ~ dir) +
+    geom_rect(
+      aes(
+        xmin=30,
+        xmax=50,
+        ymin=0,
+        ymax=120),
+      fill="cadetblue3") +
+    geom_point()
+  
+  return(p)
+}
+
+#
+# Bandwidth vs. time for single op/block size (e.g. drive conditioning run).
+#
+simple_bw_vs_time <- function(df) {
+  p <- ggplot(df) +
+    aes(time, rate) +
+    xlab("Time (s)") +
+    ylab("Bandwidth (MB/s)") +
+    geom_smooth()
+
+  return(p)
+}
+
 #
 # Compare two bandwidth summary frames.
 #
